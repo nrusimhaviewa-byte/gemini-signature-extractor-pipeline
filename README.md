@@ -1,6 +1,6 @@
 # 🖋️ Gemini Form Signature Analyser & Reference Dataset Comparator
 
-Inspired by [`ktravin/form_signature_analyser`](https://github.com/ktravin/form_signature_analyser), this project is a production-grade Python solution utilizing **Google Gemini Multimodal Vision API** (`google-genai` SDK) to perform automated signature analysis on document forms and dataset-wide reference comparison.
+A production-grade Python solution utilizing **Google Gemini Multimodal Vision API** (`google-genai` SDK) to perform automated signature detection, visual grounding (bounding boxes), metadata extraction, and dataset-wide reference comparison.
 
 ---
 
@@ -44,27 +44,34 @@ Inspired by [`ktravin/form_signature_analyser`](https://github.com/ktravin/form_
 
 ---
 
-## 📋 Features
+## 📋 Key Features & Innovations
 
 ### Stage 1: Document Form Signature Analysis
-- **Full Page Signature Detection**: Finds signatures anywhere on the document without assumption of fixed location.
-- **Classification**:
-  - `wet_signature`: Handwritten on paper.
+- **Full Page Signature Detection**: Finds signatures anywhere on the document without assuming a fixed layout.
+- **Classification Engine**:
+  - `wet_signature`: Authentic handwritten signature on paper.
   - `pasted_image`: Digitally inserted signature snippet.
-  - `signature_does_not_exist`: No signature detected.
-  - `uncertain`: Insufficient visual evidence.
-- **Visual Grounding**: Returns normalized bounding boxes `[ymin, xmin, ymax, xmax]`.
-- **Cropping & Annotations**: Crops signature image and creates annotated full-page output with red bounding box overlay.
+  - `signature_does_not_exist`: Unsigned or blank signature line.
+  - `uncertain`: Insufficient image resolution or heavy occlusion.
+- **Visual Grounding**: Returns normalized bounding boxes `[ymin, xmin, ymax, xmax]` (0-1000 scale).
+- **Cropping & Annotations**: Crops signature snippets and produces bounding box overlays.
 
-### Stage 2: Dataset Comparison & Similarity Audit
+### Stage 2: Reference Dataset Comparison
 - **N-to-1 Dataset Evaluation**: Compares cropped signature against every reference signature in `signaturedataset/`.
 - **Match Categories**: `PERFECT MATCH`, `PARTIAL MATCH`, `NO MATCH`, `UNCERTAIN`.
-- **Confidence Rating**: Score from `1` to `100`.
+- **Confidence Rating**: Visual confidence integer from `1` to `100`.
 - **Explainable Evidence**: Generates visual trajectory reasoning, initial strokes, loop structures, and terminal flourishes.
 
-### Output Artifacts
-- **Landscape DOCX Audit Report**: Contains side-by-side tables with image crops, dataset reference details, and visual evidence notes.
-- **Structured JSON & CSV Export**: Timestamped execution records under `results/analyse&compare-YYYYMMDDHHMISS/`.
+---
+
+## 📊 Industry Benchmark Comparison
+
+| System / Repository | Signature Detection | Bounding Box Grounding | Metadata Extraction | Forensic Dataset Comparison | Automated Landscape DOCX Report | Zero-Training Required |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **OpenCV Connected Components** (`ahmetozlu/signature_extractor`) | ⚠️ Rule-based | ❌ Coarse Mask | ❌ No | ❌ No | ❌ No | ⚠️ High Tuning |
+| **YOLOv8 Detection** (`khizar-anjum/signature_extraction`) | ✅ Object Model | ✅ Pixel Box | ❌ No | ❌ No | ❌ No | ❌ Needs Training Data |
+| **Siamese SigNet** (`BADMG/SignatureVerification`) | ❌ No | ❌ No | ❌ No | ✅ Distance Embeddings | ❌ No | ❌ Needs Triplet Loss Data |
+| **Gemini Signature Pipeline (This Project)** | **✅ Multimodal VLM** | **✅ `[0-1000]` Normalized** | **✅ Signatory, Role & Date** | **✅ Visual Stroke Trajectory** | **✅ Built-in (.docx)** | **✅ Prompt & Schema** |
 
 ---
 
@@ -94,3 +101,15 @@ python main.py
 # Run on your custom application form against custom signature dataset
 python main.py application_form.jpg --dataset-dir signaturedataset --output-dir results --model gemini-2.5-flash
 ```
+
+---
+
+## 📄 Output Artifacts Generated
+
+Every execution creates a timestamped run folder under `results/analyse&compare-YYYYMMDDHHMISS/`:
+- `analysis-YYYYMMDDHHMISS.json`: Full Stage 1 detection JSON.
+- `form_with_signature_box.png`: Document with red bounding box overlay.
+- `signature_crop.png`: Extracted signature crop image.
+- `comparison_results-YYYYMMDDHHMISS.json`: Full Stage 2 comparative JSON.
+- `comparison_results-YYYYMMDDHHMISS.csv`: Tabular CSV of dataset comparison results.
+- `signature_comparison_report-YYYYMMDDHHMISS.docx`: Formatted landscape Word report with side-by-side tables.
