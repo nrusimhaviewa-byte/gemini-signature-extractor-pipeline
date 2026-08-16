@@ -64,14 +64,18 @@ A production-grade Python solution utilizing **Google Gemini Multimodal Vision A
 
 ---
 
-## 📊 Industry Benchmark Comparison
+## 📊 Industry & Model Benchmark Comparison
 
-| System / Repository | Signature Detection | Bounding Box Grounding | Metadata Extraction | Forensic Dataset Comparison | Automated Landscape DOCX Report | Zero-Training Required |
+For full details, see [`BENCHMARK.md`](https://github.com/nrusimhaviewa-byte/gemini-signature-extractor-pipeline/blob/main/BENCHMARK.md).
+
+| System / Model | Provider / Architecture | DocVQA Accuracy | Bounding Box Precision | Signature Detection | Latency | Price / 1M Tokens |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **OpenCV Connected Components** (`ahmetozlu/signature_extractor`) | ⚠️ Rule-based | ❌ Coarse Mask | ❌ No | ❌ No | ❌ No | ⚠️ High Tuning |
-| **YOLOv8 Detection** (`khizar-anjum/signature_extraction`) | ✅ Object Model | ✅ Pixel Box | ❌ No | ❌ No | ❌ No | ❌ Needs Training Data |
-| **Siamese SigNet** (`BADMG/SignatureVerification`) | ❌ No | ❌ No | ❌ No | ✅ Distance Embeddings | ❌ No | ❌ Needs Triplet Loss Data |
-| **Gemini Signature Pipeline (This Project)** | **✅ Multimodal VLM** | **✅ `[0-1000]` Normalized** | **✅ Signatory, Role & Date** | **✅ Visual Stroke Trajectory** | **✅ Built-in (.docx)** | **✅ Prompt & Schema** |
+| **Gemini 3.7 Flash** | Google API | **97.4%** | **Extreme (`[0-1000]`)** | **98.2%** | ~0.4s | \$0.10 |
+| **Gemini 3.6 Flash** | Google API | **96.5%** | **High (`[0-1000]`)** | **97.4%** | **~0.3s** | **\$0.075** |
+| **Gemini 3.1 Pro** | Google API | **97.8%** | **Extreme (`[0-1000]`)** | **98.5%** | ~1.5s | \$1.25 |
+| **Qwen2.5-VL-72B** | Open-Weights | 96.4% | High | 96.5% | ~0.6s | Self-Hosted |
+| **GPT-4o** | OpenAI API | 96.1% | Medium-High | 96.2% | ~0.8s | \$2.50 |
+| **YOLOv8-Signature** | Object Model | N/A | Extreme (Box Only) | 98.2% | ~0.005s | Self-Hosted |
 
 ---
 
@@ -92,14 +96,17 @@ export GEMINI_API_KEY="your-google-gemini-api-key"
 
 ---
 
-## 🚀 Execution
+## 🚀 Execution Commands
 
 ```bash
-# Run with sample contract and synthetic reference dataset
+# Run default pipeline with Gemini 3.6 Flash
 python main.py
 
-# Run on your custom application form against custom signature dataset
-python main.py application_form.jpg --dataset-dir signaturedataset --output-dir results --model gemini-2.5-flash
+# Run with Gemini 3.7 Flash (State-of-the-Art)
+python main.py application_form.jpg --model gemini-3.7-flash
+
+# Run with Gemini 3.5 Flash-Lite (Low-Cost Screening)
+python main.py application_form.jpg --model gemini-3.5-flash-lite
 ```
 
 ---
